@@ -35,7 +35,7 @@ class ListStoryPage extends StatelessWidget {
                     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: InkWell(
                       onTap: () {
-                        context.push('/story/${story.id}');
+                        context.go('/story/${story.id}');
                       },
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,14 +72,12 @@ class ListStoryPage extends StatelessWidget {
               return Center(child: Text(storyProvider.message));
             case ResultState.error:
               return Center(child: Text(storyProvider.message));
-            default: // initial state
-                return const Center(child: CircularProgressIndicator());
           }
         },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.push('/add');
+          context.go('/add');
         },
         child: const Icon(Icons.add),
       ),

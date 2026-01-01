@@ -34,9 +34,6 @@ class _DetailStoryPageState extends State<DetailStoryPage> {
               return const Center(child: CircularProgressIndicator());
             case ResultState.hasData:
               final story = storyProvider.detailStory;
-              if (story == null) {
-                return const Center(child: Text('Story not found.'));
-              }
               return SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,8 +76,8 @@ class _DetailStoryPageState extends State<DetailStoryPage> {
               );
             case ResultState.error:
               return Center(child: Text(storyProvider.detailMessage));
-            default: // initial state
-              return const Center(child: CircularProgressIndicator());
+            default:
+              return const Center(child: Text(''));
           }
         },
       ),
