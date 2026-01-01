@@ -31,9 +31,13 @@ class _DetailStoryPageState extends State<DetailStoryPage> {
         builder: (context, storyProvider, child) {
           switch (storyProvider.detailState) {
             case ResultState.loading:
+            case ResultState.initial: // Show loading for initial state as well
               return const Center(child: CircularProgressIndicator());
             case ResultState.hasData:
               final story = storyProvider.detailStory;
+              if (story == null) {
+                return const Center(child: Text('Story not found.'));
+              }
               return SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +81,7 @@ class _DetailStoryPageState extends State<DetailStoryPage> {
             case ResultState.error:
               return Center(child: Text(storyProvider.detailMessage));
             default:
-              return const Center(child: Text(''));
+              return const Center(child: Text('Something went wrong.'));
           }
         },
       ),

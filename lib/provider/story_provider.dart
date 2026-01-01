@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:story_app_flutter_intermediate/api/api_service.dart';
 import 'package:story_app_flutter_intermediate/data/model/story.dart';
 
-enum ResultState { loading, noData, hasData, error }
+enum ResultState { initial, loading, noData, hasData, error }
 
 class StoryProvider extends ChangeNotifier {
   final ApiService apiService;
   final String token;
 
   StoryProvider({required this.apiService, required this.token}) {
-    _fetchAllStories();
+    if (token.isNotEmpty) {
+      _fetchAllStories();
+    }
   }
 
   // State for list of stories
-  late ResultState _state;
+  ResultState _state = ResultState.initial;
   ResultState get state => _state;
   String _message = '';
   String get message => _message;
@@ -21,12 +23,12 @@ class StoryProvider extends ChangeNotifier {
   List<Story> get stories => _stories;
 
   // State for detail of a story
-  late ResultState _detailState;
+  ResultState _detailState = ResultState.initial;
   ResultState get detailState => _detailState;
   String _detailMessage = '';
   String get detailMessage => _detailMessage;
-  late Story _detailStory;
-  Story get detailStory => _detailStory;
+  Story? _detailStory;
+  Story? get detailStory => _detailStory;
 
   Future<void> _fetchAllStories() async {
     try {

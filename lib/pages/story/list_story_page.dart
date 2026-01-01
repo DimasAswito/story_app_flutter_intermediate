@@ -25,6 +25,7 @@ class ListStoryPage extends StatelessWidget {
         builder: (context, storyProvider, child) {
           switch (storyProvider.state) {
             case ResultState.loading:
+            case ResultState.initial:
               return const Center(child: CircularProgressIndicator());
             case ResultState.hasData:
               return ListView.builder(
@@ -35,7 +36,7 @@ class ListStoryPage extends StatelessWidget {
                     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: InkWell(
                       onTap: () {
-                        context.go('/story/${story.id}');
+                        context.push('/story/${story.id}');
                       },
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +78,7 @@ class ListStoryPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.go('/add');
+          context.push('/add');
         },
         child: const Icon(Icons.add),
       ),

@@ -31,17 +31,21 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final response = await apiService.login(email, password);
-    if (!response['error']) {
-      final token = response['loginResult']['token'];
-      await authPreferences.saveSession(token);
-      _token = token;
-      _isLoggedIn = true;
+    try {
+      final response = await apiService.login(email, password);
+      if (!response['error']) {
+        final token = response['loginResult']['token'];
+        await authPreferences.saveSession(token);
+        _token = token;
+        _isLoggedIn = true;
+      }
+      return response;
+    } catch (e) {
+      return {'error': true, 'message': 'An error occurred. Please check your connection.'};
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
-
-    _isLoading = false;
-    notifyListeners();
-    return response;
   }
 
   Future<Map<String, dynamic>> register(
@@ -49,11 +53,15 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final response = await apiService.register(name, email, password);
-
-    _isLoading = false;
-    notifyListeners();
-    return response;
+    try {
+        final response = await apiService.register(name, email, password);
+        return response;
+    } catch (e) {
+        return {'error': true, 'message': 'An error occurred. Please check your connection.'};
+    } finally {
+        _isLoading = false;
+        notifyListeners();
+    }
   }
 
   Future<void> logout() async {

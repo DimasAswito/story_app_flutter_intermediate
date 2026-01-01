@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:story_app_flutter_intermediate/data/model/story.dart';
 
 class ApiService {
   static const String _baseUrl = 'https://story-api.dicoding.dev/v1';
