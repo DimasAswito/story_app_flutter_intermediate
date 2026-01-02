@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:geolocator/geolocator.dart';
@@ -86,9 +88,7 @@ class _AddStoryPageState extends State<AddStoryPage> {
                 },
               ),
               const SizedBox(height: 24),
-
               if (AppConfig.isPaid) _buildMapFeature(),
-
               const SizedBox(height: 24),
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
@@ -124,8 +124,14 @@ class _AddStoryPageState extends State<AddStoryPage> {
               target: _initialCameraPosition,
               zoom: 4,
             ),
-            onMapCreated: (controller) =>
-                setState(() => _mapController = controller),
+            gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+              Factory<OneSequenceGestureRecognizer>(
+                () => EagerGestureRecognizer(),
+              ),
+            },
+            onMapCreated: (controller) {
+              _mapController = controller;
+            },
             onTap: (LatLng position) => _onMapTapped(position),
             markers: _markers,
             mapType: MapType.normal,
@@ -141,17 +147,19 @@ class _AddStoryPageState extends State<AddStoryPage> {
   }
 
   void _onMapTapped(LatLng position) async {
+    final address = await _getAddressFromLatLng(position);
     setState(() {
       _selectedPosition = position;
+      _address = address;
       _markers.clear();
       _markers.add(
         Marker(
           markerId: const MarkerId('selected-location'),
           position: position,
+          infoWindow: InfoWindow(title: 'Selected Location', snippet: address),
         ),
       );
     });
-    await _getAddressFromLatLng(position);
   }
 
   Future<void> _getCurrentLocation() async {
@@ -193,7 +201,7 @@ class _AddStoryPageState extends State<AddStoryPage> {
     return await Geolocator.getCurrentPosition();
   }
 
-  Future<void> _getAddressFromLatLng(LatLng position) async {
+  Future<String> _getAddressFromLatLng(LatLng position) async {
     try {
       final placemarks = await geo.placemarkFromCoordinates(
         position.latitude,
@@ -201,13 +209,11 @@ class _AddStoryPageState extends State<AddStoryPage> {
       );
       if (placemarks.isNotEmpty) {
         final placemark = placemarks[0];
-        setState(() {
-          _address =
-              '${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.postalCode}, ${placemark.country}';
-        });
+        return '${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.postalCode}, ${placemark.country}';
       }
+      return 'Address not found';
     } catch (e) {
-      setState(() => _address = 'Could not get address');
+      return 'Could not get address';
     }
   }
 

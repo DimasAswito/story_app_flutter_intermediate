@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart' as geo;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:story_app_flutter_intermediate/provider/story_provider.dart';
-import 'package:geocoding/geocoding.dart' as geo;
 
 class DetailStoryPage extends StatefulWidget {
   final String id;
@@ -126,6 +128,7 @@ class _DetailStoryPageState extends State<DetailStoryPage> {
     final marker = Marker(
       markerId: const MarkerId('story_location'),
       position: position,
+      infoWindow: InfoWindow(title: 'Story Location', snippet: _address),
     );
 
     return Padding(
@@ -139,13 +142,18 @@ class _DetailStoryPageState extends State<DetailStoryPage> {
           ),
           const SizedBox(height: 8),
           Text(_address),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           SizedBox(
             height: 200,
             child: GoogleMap(
               initialCameraPosition: CameraPosition(target: position, zoom: 15),
+              gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                Factory<OneSequenceGestureRecognizer>(
+                  () => EagerGestureRecognizer(),
+                ),
+              },
               markers: {marker},
-              mapType: MapType.normal, // Use normal map type to show POIs
+              mapType: MapType.normal,
             ),
           ),
         ],
