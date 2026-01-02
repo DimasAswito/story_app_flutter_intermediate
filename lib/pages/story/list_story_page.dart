@@ -60,13 +60,13 @@ class _ListStoryPageState extends State<ListStoryPage> {
             TextButton(
               child: const Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop();
+                context.pop();
               },
             ),
             TextButton(
               child: const Text('Logout'),
               onPressed: () {
-                Navigator.of(context).pop();
+                context.pop();
                 Provider.of<AuthProvider>(context, listen: false).logout();
               },
             ),
