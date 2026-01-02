@@ -41,7 +41,10 @@ class AuthProvider extends ChangeNotifier {
       }
       return response;
     } catch (e) {
-      return {'error': true, 'message': 'An error occurred. Please check your connection.'};
+      return {
+        'error': true,
+        'message': 'An error occurred. Please check your connection.',
+      };
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -49,18 +52,24 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> register(
-      String name, String email, String password) async {
+    String name,
+    String email,
+    String password,
+  ) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-        final response = await apiService.register(name, email, password);
-        return response;
+      final response = await apiService.register(name, email, password);
+      return response;
     } catch (e) {
-        return {'error': true, 'message': 'An error occurred. Please check your connection.'};
+      return {
+        'error': true,
+        'message': 'An error occurred. Please check your connection.',
+      };
     } finally {
-        _isLoading = false;
-        notifyListeners();
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

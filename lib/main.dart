@@ -23,20 +23,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<ApiService>(
-          create: (_) => ApiService(),
-        ),
+        Provider<ApiService>(create: (_) => ApiService()),
         ChangeNotifierProvider<AuthProvider>(
           create: (context) => AuthProvider(
-            authPreferences: AuthPreferences(sharedPreferences: sharedPreferences),
+            authPreferences: AuthPreferences(
+              sharedPreferences: sharedPreferences,
+            ),
             apiService: context.read<ApiService>(),
           ),
         ),
         ChangeNotifierProxyProvider<AuthProvider, StoryProvider>(
-          create: (context) => StoryProvider(
-            apiService: context.read<ApiService>(),
-            token: ''
-          ),
+          create: (context) =>
+              StoryProvider(apiService: context.read<ApiService>(), token: ''),
           update: (context, auth, previous) => StoryProvider(
             apiService: context.read<ApiService>(),
             token: auth.token ?? '',

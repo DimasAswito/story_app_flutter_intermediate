@@ -10,17 +10,23 @@ class StoryProvider extends ChangeNotifier {
 
   StoryProvider({required this.apiService, required this.token}) {
     if (token.isNotEmpty) {
-      _fetchAllStories();
+      fetchAllStories();
     }
   }
 
-  // State for list of stories
+  // State for list of stories (for pagination)
   ResultState _state = ResultState.initial;
   ResultState get state => _state;
   String _message = '';
   String get message => _message;
   List<Story> _stories = [];
   List<Story> get stories => _stories;
+
+  // Pagination state
+  int _page = 1;
+  final int _size = 10;
+  bool _hasReachedMax = false;
+  bool get hasReachedMax => _hasReachedMax;
 
   // State for detail of a story
   ResultState _detailState = ResultState.initial;
@@ -30,28 +36,53 @@ class StoryProvider extends ChangeNotifier {
   Story? _detailStory;
   Story? get detailStory => _detailStory;
 
-  Future<void> _fetchAllStories() async {
-    try {
+  Future<void> fetchAllStories({bool isInitialLoad = false}) async {
+    if (isInitialLoad) {
+      _page = 1;
+      _stories = [];
+      _hasReachedMax = false;
       _state = ResultState.loading;
       notifyListeners();
+    } else if (_state == ResultState.loading || _hasReachedMax) {
+      // Prevent multiple requests or fetching beyond the end
+      return;
+    }
 
-      final response = await apiService.getAllStories(token);
+    try {
+      final response = await apiService.getAllStories(
+        token,
+        page: _page,
+        size: _size,
+      );
       if (response['error'] == false) {
         final List<dynamic> storyList = response['listStory'];
-        if (storyList.isEmpty) {
+
+        if (storyList.length < _size) {
+          _hasReachedMax = true;
+        }
+
+        final newStories = storyList
+            .map((json) => Story.fromJson(json))
+            .toList();
+        _stories.addAll(newStories);
+
+        if (_stories.isEmpty) {
           _state = ResultState.noData;
           _message = 'No stories found.';
         } else {
           _state = ResultState.hasData;
-          _stories = storyList.map((json) => Story.fromJson(json)).toList();
         }
-      } else {
+
+        _page++; // Increment for next fetch
+      } else if (isInitialLoad) {
         _state = ResultState.error;
         _message = response['message'];
       }
     } catch (e) {
-      _state = ResultState.error;
-      _message = 'Failed to load stories. Please check your connection.';
+      if (isInitialLoad) {
+        _state = ResultState.error;
+        _message = 'Failed to load stories. Please check your connection.';
+      }
     } finally {
       notifyListeners();
     }
@@ -79,11 +110,23 @@ class StoryProvider extends ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> addNewStory(
-      String description, List<int> bytes, String fileName) async {
+    String description,
+    List<int> bytes,
+    String fileName, {
+    double? lat,
+    double? lon,
+  }) async {
     try {
-      final response = await apiService.addNewStory(token, description, bytes, fileName);
+      final response = await apiService.addNewStory(
+        token,
+        description,
+        bytes,
+        fileName,
+        lat: lat,
+        lon: lon,
+      );
       if (response['error'] == false) {
-        await _fetchAllStories();
+        await fetchAllStories(isInitialLoad: true); // Refresh list
       }
       return response;
     } catch (e) {

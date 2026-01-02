@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'story.g.dart';
+
+@JsonSerializable()
 class Story {
   final String id;
   final String name;
@@ -17,15 +22,7 @@ class Story {
     this.lon,
   });
 
-  factory Story.fromJson(Map<String, dynamic> json) {
-    return Story(
-      id: json['id'],
-      name: json['name'],
-      description: json['description'],
-      photoUrl: json['photoUrl'],
-      createdAt: DateTime.parse(json['createdAt']),
-      lat: (json['lat'] as num?)?.toDouble(),
-      lon: (json['lon'] as num?)?.toDouble(),
-    );
-  }
+  factory Story.fromJson(Map<String, dynamic> json) => _$StoryFromJson(json);
+
+  Map<String, dynamic> toJson() => _$StoryToJson(this);
 }

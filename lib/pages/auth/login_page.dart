@@ -26,9 +26,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
+      appBar: AppBar(title: const Text('Login')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -64,7 +62,9 @@ class _LoginPageState extends State<LoginPage> {
                     border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        _isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
@@ -100,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    context.go('/register');
+                    context.push('/register'); // Changed to push
                   },
                   child: const Text('Don\'t have an account? Register'),
                 ),
@@ -129,7 +129,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           );
         }
-        // Navigasi tidak diperlukan di sini karena GoRouter akan menanganinya secara otomatis.
       }
     }
   }
